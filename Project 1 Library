@@ -1,0 +1,331 @@
+import json
+
+
+class Book:
+    def __init__(self, title, author, isbn, quantity):
+        self.title = title
+        self.author = author
+        self.isbn = isbn
+        self.quantity = quantity
+
+    def display_details(self):
+        print(f"Title: {self.title}\nAuthor: {self.author}\nISBN: {self.isbn}\nQuantity: {self.quantity}")
+
+    def to_dict(self):
+        return {
+            "title": self.title,
+            "author": self.author,
+            "isbn": self.isbn,
+            "quantity": self.quantity
+        }
+
+
+class Patron:
+    def __init__(self, name, patron_id, contact_info):
+        self.name = name
+        self.patron_id = patron_id
+        self.contact_info = contact_info
+
+    def display_details(self):
+        print(f"Name: {self.name}\nID: {self.patron_id}\nContact Info: {self.contact_info}")
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "id": self.patron_id,
+            "contact_info": self.contact_info
+        }
+
+
+class Transaction:
+    def __init__(self, book, patron, due_date):
+        self.book = book
+        self.patron = patron
+        self.due_date = due_date
+        self.checked_out = False
+
+    def check_out(self):
+        if self.book.quantity > 0 and not self.checked_out:
+            self.checked_out = True
+            self.book.quantity -= 1
+            print(f"Book '{self.book.title}' checked out to {self.patron.name}")
+        else:
+            print("Book not available for checkout or already checked out")
+
+    def check_in(self):
+        if self.checked_out:
+            self.checked_out = False
+            self.book.quantity += 1
+            print(f"Book '{self.book.title}' checked in")
+        else:
+            print("Book is not checked out")
+
+
+class Library:
+    def __init__(self):
+        self.books = []  # List to store books
+        self.patrons = []  # List to store patrons
+        self.transactions = []  # List to store transactions
+
+    def add_book(self, book):
+        self.books.append(book)
+
+    def remove_book(self, book):
+        self.books.remove(book)
+
+    def add_patron(self, patron):
+        self.patrons.append(patron)
+
+    def remove_patron(self, patron):
+        self.patrons.remove(patron)
+
+    def search_books(self, query):
+        return [book for book in self.books if query in [book.title, book.author, book.isbn]]
+
+    def handle_transaction(self, transaction):
+        self.transactions.append(transaction)
+
+    def generate_reports(self):
+        total_books = len(self.books)
+        total_patrons = len(self.patrons)
+        total_transactions = len(self.transactions)
+
+        print("Library Reports:")
+        print(f"Total Books in Library: {total_books}")
+        print(f"Total Patrons registered: {total_patrons}")
+        print(f"Total Transactions conducted: {total_transactions}")
+
+
+class LibraryCLI:
+    def __init__(self, library):
+        self.library = library
+
+    def display_menu(self):
+        print("Library Management System Menu:")
+        print("1. Add a book")
+        print("2. Remove a book")
+        print("3. Exit")
+
+    def run(self):
+        while True:
+            self.display_menu()
+            choice = input("Enter your choice: ")
+            if choice == '1':
+                self.add_book()
+            elif choice == '2':
+                self.remove_book()
+            elif choice == '3':
+                break
+            else:
+                print("Invalid choice, please try again.")
+
+    def add_book(self):
+        title = input("Enter the title of the book: ")
+        author = input("Enter the author of the book: ")
+        isbn = input("Enter the ISBN of the book: ")
+        quantity = int(input("Enter the quantity of the book: "))
+
+        new_book = Book(title, author, isbn, quantity)
+        self.library.add_book(new_book)
+        print("Book added successfully.")
+
+    def remove_book(self):
+        title = input("Enter the title of the book to remove: ")
+        for book in self.library.books:
+            if book.title == title:
+                self.library.remove_book(book)
+                print("Book removed successfully.")
+                return
+        print("Book not found.")
+
+
+def main():
+    library = Library()
+    library_cli = LibraryCLI(library)
+    library_cli.run()
+
+
+if __name__ == "__main__":
+    main()
+
+book1 = Book("How to Code", "Victor", "123456789", 5)
+patron1 = Patron("Ken Arty", "P001", "Ken@example.com")
+transaction1 = Transaction(book1, patron1, "2022-12-31")
+
+library = Library()
+library_cli = LibraryCLI(library)
+
+# Add books
+book1 = Book("How to code in Python", "Victor Deni", "9780743273565", 5)
+book2 = Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 3)
+library.add_book(book1)
+library.add_book(book2)
+
+# Add patrons (assuming Patron objects are added similarly)
+patron1 = Patron("Ken", "123", "Ken@example.com")
+patron2 = Patron("Bob", "456", "bob@example.com")
+library.add_patron(patron1)
+library.add_patron(patron2)
+
+# Perform transactions (checking out a book)
+transaction = Transaction(book1, patron1, "2024-03-10")
+transaction.check_out()
+
+# Remove a book
+library_cli.remove_book()
+
+# Generate reports
+library.generate_reports()
+
+
+Project Description:
+
+This project represents a simple library management system in Python, consisting of classes for Book, Patron, Transaction, Library, and LibraryCLI. Here's a brief description of each component:
+
+Book Class: Represents a book with attributes such as title, author, ISBN, and quantity. It includes methods for displaying book details and converting the book details to a dictionary.
+
+Patron Class: Represents a library patron with attributes like name, patron id, and contact information. It also includes methods to display patron details and convert patron details to a dictionary.
+
+Transaction Class: Manages book checkouts and check-ins, tracking the due dates and availability of books. It provides methods to perform these operations.
+
+Library Class: Manages the overall library system, maintaining lists of books, patrons, and transactions. It includes methods to add and remove books, handle transactions, generate reports, and search for books based on a query.
+
+LibraryCLI Class: Offers a command-line interface for users to interact with the library management system. The interface presents a menu for adding and removing books and includes methods to handle user input and interact with the library accordingly.
+
+Main Function: Initializes the Library instance and the LibraryCLI instance, then launches the command-line interface for the library management system.
+
+Overall, this code provides a basic framework for a library management system with features including adding, removing, and searching for books, handling transactions, and generating reports.
+
+Structure of the Code:
+
+    
+                  Book                     
+    
+     - title: str                          
+     - author: str                         
+     - isbn: str                           
+     - quantity: int                       
+    
+     + display_details()                   
+     + to_dict() -> dict                   
+   
+
+    
+                  Patron                   
+    
+     - name: str                           
+     - patron_id: str                      
+     - contact_info: str                   
+    
+     + display_details()                   
+     + to_dict() -> dict                   
+    
+
+    
+               Transaction                 
+    
+     - book: Book                          
+     - patron: Patron                      
+     - due_date: str                       
+     - checked_out: bool                    
+    
+     + check_out()                         
+     + check_in()                          
+   
+
+   
+                 Library                   
+    
+     - books: List[Book]                   
+     - patrons: List[Patron]               
+     - transactions: List[Transaction]     
+    
+     + add_book(book: Book)                
+     + remove_book(book: Book)             
+     + add_patron(patron: Patron)          
+     + remove_patron(patron: Patron)       
+     + search_books(query: str) -> List    
+     + handle_transaction(transaction)    
+     + generate_reports()                  
+    
+
+   
+               LibraryCLI                  
+    
+     - library: Library                    
+    
+     + display_menu()                      
+     + run()                               
+     + add_book()                          
+     + remove_book()                       
+   
+
+    
+                   main                    
+   
+     - library: Library                    
+     - library_cli: LibraryCLI             
+    
+
+Comments:
+- The code is organized into classes representing different aspects of a library management system.
+- Each class has well-defined responsibilities and methods to perform actions related to those responsibilities.
+- The `main` function initializes the library and the command-line interface, starting the program's execution.
+- The structure is modular, making it easy to understand and maintain.
+
+
+Adding Books:
+Run the script.
+Choose option 1 from the menu to add a book.
+Input the details of the book when prompted: title, author, ISBN, and quantity.
+The book will be added to the library.
+
+
+
+Removing Books:
+Run the script.
+Choose option 2 from the menu to remove a book.
+Input the title of the book you want to remove when prompted.
+If the book exists in the library, it will be removed; otherwise, a message indicating that the book was not found will be displayed.
+
+
+Generating Reports:
+Run the script.
+Choose option 3 from the menu to exit.
+After exiting, a summary report will automatically be generated, displaying the total number of books in the library, total patrons registered, and total transactions conducted.
+
+
+
+Scenario 1: Adding Books
+The user selects to add a book from the menu.
+The user inputs the details of the book: title, author, ISBN, and quantity.
+The system creates a new Book object with the provided details.
+The system adds the new book to the library.
+A confirmation message is displayed.
+
+
+Scenario 2: Checking Out Books
+Patron selects to check out a book.
+Patron provides their name or ID (assuming the library has a method to look up patrons by name or ID).
+Patron specifies the book to check out.
+The system verifies if the book is available and not already checked out.
+If the book is available, the system creates a new Transaction object with the book, patron, and due date.
+The system updates the quantity of the book and marks it as checked out.
+A confirmation message is displayed.
+
+
+Scenario 3: Generating Reports
+The library administrator selects to generate reports from the menu.
+The system calculates the total number of books in the library, the total number of patrons, and the total number of transactions.
+The system displays the generated reports including the total books, total patrons, and total transactions.
+
+Discuss
+
+I had some challenges with managing large volumes of data, ensuring data consistency, and implementing mechanisms for data retrieval, storage, and manipulation.
+
+The project seems well-structured and covers essential functionalities. However, there are some potential areas for improvement and challenges I faced during implementation: 
+I need to improve the CLI interface with clearer prompts, error messages, and formatting which could enhance the user experience.
+
+
+
+
